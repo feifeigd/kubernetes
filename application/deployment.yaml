@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # 唯一标记一个资源
+  name: nginx-deployment
+spec:
+  # 告知 Deployment 运行 2 个与该模版匹配的 Pod
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  # Pod 的模版
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 80
