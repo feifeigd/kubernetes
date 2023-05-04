@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: hello
+
+spec:
+  schedule: "* * * * *"
+  jobTemplate:
+    spec:
+      # pod 模版
+      template:
+        spec:
+          containers:
+          - name: hello
+            image: busybox:1.28
+            command:
+            - /bin/sh
+            - -c
+            - date; echo Hello from the kubernetes cluster
+          restartPolicy: OnFailure
