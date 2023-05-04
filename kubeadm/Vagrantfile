@@ -1,0 +1,63 @@
+
+# 宿主机的 ip
+host_ip = "192.168.56.1"
+# 主节点的ip
+master_ip = "192.168.56.10"
+
+# 所有的集群节点
+nodes = {
+    "master"    => master_ip,
+    "node1"     => "192.168.56.11",
+}
+
+Vagrant.configure(2) do |config|
+    # 使用 Vagrant 默认的 不安全 key，而不生成独立的密钥对
+    config.ssh.insert_key = false
+    # 转发 SSH 代理，以便轻松地将 SSH 转移到不同的机器上
+    config.ssh.forward_agent = true
+    config.vm.synced_folder "..", "/vagrant_data"
+
+    config.vm.provider :docker do |docker, override|
+        override.vm.box = nil
+
+        # https://github.com/rofrano/vagrant-docker-provider
+        docker.image = "rofrano/vagrant-provider:ubuntu"
+
+        docker.remains_running = true
+        docker.has_ssh = true
+        docker.privileged = true
+        docker.volumes =["/sys/fs/cgroup:/sys/fs/cgroup:rw"]
+        docker.create_args = ["--cgroupns=host"]
+    end
+    config.vm.provider :virtualbox do |vb|
+        vb.memory = "2048"
+        vb.cpus = 2
+    end
+
+    # 安装 docker
+    config.vm.provision :docker do |d|
+    end
+    # 设置上网代理
+    config.vm.provision :shell, inline: <<-SHELL
+        profile=/etc/profile.d/proxy.sh
+        host_proxy="#{host_ip}:7890"
+        echo "export http_proxy=http://$host_proxy https_proxy=http://$host_proxy all_proxy=sock5://$host_proxy" > $profile && . $profile && curl https://google.com
+    SHELL
+    # ansible 需要python
+    config.vm.provision :shell, inline: <<-SHELL
+        sed -i 's@//.*archive.ubuntu.com@//mirrors.ustc.edu.cn@g' /etc/apt/sources.list
+        apt update
+        apt install -y python3-pip
+    SHELL
+
+    # 创建集群节点
+    nodes.each do |name, ip|
+        config.vm.define name do |machine|
+            machine.vm.hostname = name
+            machine.vm.network :private_network, ip: ip
+            machine.vm.provider :virtualbox do |vb|
+                vb.name = name
+            end
+        end
+    end
+end

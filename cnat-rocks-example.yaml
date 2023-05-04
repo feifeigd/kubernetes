@@ -1,0 +1,19 @@
+# TypeMeta
+
+# <group>/<version>
+apiVersion: crd.k8s.d7kj.com/v1
+kind: At
+
+metadata:
+  name: cnrex
+
+# 规格 Specification 是对于某种资源的期望状态的完整描述，经常会被持久化到存储系统中，通常是etcd
+# spec:
+#   schedule: "2023-05-01T10:38:00Z"
+#   containers:
+#   - name: shell
+#     image: ubuntu:22.04
+#     command:
+#     - bin/bash
+#     - -c
+#     - echo "Kubernetes native rocks!"

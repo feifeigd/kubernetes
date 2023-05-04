@@ -4,15 +4,21 @@ kind: CustomResourceDefinition
 metadata:
   name: ats.crd.k8s.d7kj.com
 spec:
+  # group name to be for REST API: /apis/<group>/<version>
   group: crd.k8s.d7kj.com
   names:
     kind: At
     listKind: AtList
     # 资源 kind 的复数
     plural: ats
+    shortNames:
+      - at
+    singular: at
+  # 作用域 either Namespaced or Cluster
   scope: Namespaced
   versions:
     - name: v1
+      # 类型定义
       schema:
         openAPIV3Schema:
           type: object
@@ -21,5 +27,22 @@ spec:
               type: string
             kind:
               type: string
+            metadata:
+              type: object
+            spec:
+              type: object
+              properties:
+                command: 
+                  type: string
+                schedule:
+                  type: string
+              required:
+                - command
+                - schedule
+          required:
+            - apiVersion
+            - kind
+            - metadata
+            - spec
       served: true
       storage: true

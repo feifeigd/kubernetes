@@ -1,0 +1,12 @@
+---
+# 主机的分组
+- hosts: all
+  become: true
+  strategy: free
+  tasks:
+    - name: Add the Google signing key
+      apt_key: url=https://package.cloud.google.com/apt-key.gpg state=present
+  # 变量的来源
+  vars_files:
+    - vars.yaml
+  

@@ -1,0 +1,7 @@
+---
+# 需要安装的包
+PACKAGES:
+- htop
+- iputils-ping
+- net-tools
+- tmux
