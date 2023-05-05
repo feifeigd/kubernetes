@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hue-learn
+  labels:
+    app: hue-learn
+    runtime-environment: production
+    # 内部服务
+    tier: internal-service
+
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hue-learn
+
+  # pod 模版
+  template:
+    metadata:
+      labels:
+        app: hue-learn
+    spec:
+      containers:
+      - name: hue-learn
+        image: hue-learn:v3.0
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+        env:
+          - name: DISCOVER_QUEUE
+            value: dns
+          - name: DISCOVER_STORE
+            value: dns
