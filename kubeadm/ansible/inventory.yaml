@@ -1,10 +1,18 @@
 
 # ansible k8s -i inventory.yaml -m ping
-k8s:
+master:
   hosts:
     master:
       ansible_host: 192.168.56.10
       ansible_user: vagrant
+
+nodes:
+  hosts:
     node1:
       ansible_host: 192.168.56.11
       ansible_user: vagrant
+
+k8s:
+  children:
+    master:
+    nodes:
