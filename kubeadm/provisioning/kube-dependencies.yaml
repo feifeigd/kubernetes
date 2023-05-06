@@ -3,6 +3,19 @@
   # become_method: sudo
   # become_user: root
   tasks:
+    # k8s 需要关闭 swap
+    # https://germaniumhq.com/2019/02/14/2019-02-14-Disabling-Swap-for-Kubernetes-in-an-Ansible-Playbook/
+    - name: Disable SWAP since kubernetes can't work with swap enabled (1/2)
+      shell: |
+        swapoff -a
+      # when: kubernetes_installed is changed
+    - name: Disable SWAP in fstab since kubernetes can't work with swap enabled (2/2)
+      replace:
+        path: /etc/fstab
+        regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
+        replace: '# \1'
+      # when: kubernetes_installed is changed
+    
     - name: Install APT Transport HTTPS
       apt:
         name: apt-transport-https
@@ -27,12 +40,12 @@
         name: kubeadm
         state: present
 
-- hosts: masters
-  # 提权 root
-  become: true
-  tasks:
-    - name: Install kubectl
-      apt:
-        name: kubectl
-        state: present
-        force: yes
+# - hosts: masters
+#   # 提权 root
+#   become: true
+#   tasks:
+#     - name: Install kubectl
+#       apt:
+#         name: kubectl
+#         state: present
+#         force: yes

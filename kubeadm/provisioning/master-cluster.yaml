@@ -1,0 +1,14 @@
+- hosts: masters
+  become: yes
+  tasks:
+    - name: Install kubectl
+      apt:
+        name: kubectl
+        state: present
+        force: yes
+    - name: Start the cluster
+      shell: kubeadm init --pod-network-cidr=10.244.0.0/16 >> cluster.txt
+      args:
+        chdir: $HOME
+        creates: cluster.txt
+    
