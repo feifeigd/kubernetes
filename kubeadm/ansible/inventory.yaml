@@ -1,22 +1,20 @@
----
-# 在宿主机执行
-# cp ~/.vagrant.d/insecure_private_key .
-global_config: &global_vars
-  ansible_ssh_private_key_file: /vagrant/insecure_private_key
-  # 所有节点用相同的帐号
-  # ansible_user: vagrant
 
+# 应用于全部分组
+all:
+  vars:
+    # 在宿主机执行
+    # cp ~/.vagrant.d/insecure_private_key .
+    ansible_ssh_private_key_file: /vagrant/insecure_private_key
+    
 # ansible k8s -i inventory.yaml -m ping
 masters:
   vars:
-    <<: *global_vars
   hosts:
     master:
       ansible_host: 192.168.56.10
 
 nodes:
   vars:
-    <<: *global_vars
   hosts:
     node1:
       ansible_host: 192.168.56.11
