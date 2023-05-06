@@ -1,5 +1,11 @@
 ---
-- hosts: k8s
-  become: true
+# 安装 k8s 集群
+# https://digitalvarys.com/install-kubernetes-cluster-with-kubeadm-and-ansible-ubuntu/
+- name: my first play
+  hosts: k8s
   tasks:
-    - shell: echo 'test'
+    - name: Ping my hosts
+      ansible.builtin.ping:
+    - name: Pring message
+      ansible.builtin.debug:
+        msg: Hello world
