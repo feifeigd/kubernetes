@@ -1,6 +1,10 @@
 
 # 宿主机的 ip
 host_ip = "192.168.56.1"
+
+# 控制节点，用于运行 ansible 
+controller_ip = "192.168.56.9"
+
 # 主节点的ip
 master_ip = "192.168.56.10"
 
@@ -12,6 +16,9 @@ nodes = {
 
 # export VAGRANT_EXPERIMENTAL="1"
 Vagrant.configure(2) do |config|
+    # 要做每个虚拟机里面执行的，写字 config 里; 
+    # 要在特定某虚拟机执行的，写在 config.vm.define 的 machine 里
+
     # 使用 Vagrant 默认的 不安全 key，而不生成独立的密钥对
     config.ssh.insert_key = false
     # 转发 SSH 代理，以便轻松地将 SSH 转移到不同的机器上
@@ -22,6 +29,7 @@ Vagrant.configure(2) do |config|
         override.vm.box = nil
 
         # https://github.com/rofrano/vagrant-docker-provider
+        # ubuntu:jammy
         docker.image = "rofrano/vagrant-provider:ubuntu"
 
         docker.remains_running = true
@@ -39,23 +47,15 @@ Vagrant.configure(2) do |config|
         
     end
 
-    # 设置上网代理
+    # 设置上网代理，修改镜像源
     config.vm.provision :shell, before: :all, name: "set proxy", inline: <<-SHELL
         profile=/etc/profile.d/proxy.sh
         host_proxy="#{host_ip}:7890"
         # mac 下，docker 的时候不需要
-        echo "export http_proxy=http://$host_proxy https_proxy=http://$host_proxy all_proxy=sock5://$host_proxy" > $profile && . $profile && curl https://google.com
+        # echo "export http_proxy=http://$host_proxy https_proxy=http://$host_proxy all_proxy=sock5://$host_proxy" > $profile && . $profile && curl https://google.com
+        sed -i 's@//.*archive.ubuntu.com@//mirrors.ustc.edu.cn@g' /etc/apt/sources.list
     SHELL
 
-    # 安装 docker
-    config.vm.provision :docker do |d|
-    end
-    # ansible 需要python
-    config.vm.provision :shell, inline: <<-SHELL
-        sed -i 's@//.*archive.ubuntu.com@//mirrors.ustc.edu.cn@g' /etc/apt/sources.list
-        apt update
-        apt install -y python3-pip
-    SHELL
 
     # 创建集群节点
     nodes.each do |name, ip|
@@ -65,6 +65,25 @@ Vagrant.configure(2) do |config|
             machine.vm.provider :virtualbox do |vb|
                 vb.name = name # 在virtualbox 界面显示的名字
             end
+            # 安装 docker
+            machine.vm.provision :docker do |d|
+            end
         end
     end
+
+    # 控制节点
+    config.vm.define :controller do |machine|
+        machine.vm.hostname = :controller
+        machine.vm.network :private_network, ip: controller_ip
+        machine.vm.provider :virtualbox do |vb|
+            vb.name = :controller
+        end
+        machine.vm.provision :ansible_local do|ansible|
+            ansible.playbook = "provisioning/playbook.yaml"
+            ansible.inventory_path = "ansible/inventory.yaml"
+            ansible.limit = :k8s
+            ansible.verbose = true
+        end
+    end
+
 end
