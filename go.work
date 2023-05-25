@@ -1,3 +1,6 @@
 go 1.19
 
-use ./hello-client
+use (
+	./hello-client
+	./k8s
+)
