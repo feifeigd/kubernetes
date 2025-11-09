@@ -1,0 +1,17 @@
+
+# kubectl port-forward svc/nginx-service 81:80
+# 宿主机访问 http://localhost:81
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+  # namespace: default
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: nginx
+  type: ClusterIP
+
