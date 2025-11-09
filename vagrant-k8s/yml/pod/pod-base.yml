@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-base
+  namespace: default
+  labels:
+    app: base-nginx 
+spec:
+  containers:
+  - name: base-nginx
+    image: nginx:latest
+    ports:
+    - containerPort: 80
+      name: web
+  restartPolicy: Always
+
+  
