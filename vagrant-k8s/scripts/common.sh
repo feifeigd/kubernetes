@@ -30,12 +30,19 @@ modprobe br_netfilter
 
 echo "允许 IPv4 数据包转发"
 cat <<EOF | tee /etc/sysctl.d/k8s.conf
-net.bridge.bridge-nf-call-ip6tables = 1
-net.bridge.bridge-nf-call-iptables = 1
+# net.bridge.bridge-nf-call-ip6tables = 1
+# net.bridge.bridge-nf-call-iptables = 1
+
+# 禁用ipv6
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+net.ipv6.conf.lo.disable_ipv6 = 1
+
 net.ipv4.ip_forward = 1
 EOF
 
 sysctl --system
+
 
 echo "apt 源, 使用阿里云源"
 sed -ri 's/http:\/\/.*\.ubuntu\.com\/ubuntu\//http:\/\/mirrors\.aliyun\.com\/ubuntu\//g' /etc/apt/sources.list.d/ubuntu.sources
