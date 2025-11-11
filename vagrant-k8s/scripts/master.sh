@@ -17,11 +17,11 @@ chown $(id -u):$(id -g) $HOME/.kube/config
 export KUBECONFIG=/etc/kubernetes/admin.conf
 # kubectl get nodes
 
-echo "安装网络插件 (Calico)"
+# echo "安装网络插件 (Calico)"
 # curl -fsSL https://docs.projectcalico.org/manifests/calico.yaml -o calico.yaml
 # kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml 
 
-# echo "安装 Flannel 网络插件"
+echo "安装 Flannel 网络插件"
 kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
 
 # 这是加入集群的命令内容
@@ -39,3 +39,18 @@ sudo mkdir -p $config_path
 fi
 
 sudo cp -i /etc/kubernetes/admin.conf $config_path/config
+
+# 如果集群只有 master 一个节点，没有其他工作节点，
+# 则删除主节点的 NoSchedule 污点，允许其调度 Pod
+# kubectl taint nodes k8s-master node-role.kubernetes.io/control-plane:NoSchedule-
+
+# 包管理器 Helm 安装
+echo "安装 Helm"
+wget https://get.helm.sh/helm-v3.19.1-linux-amd64.tar.gz -O /vagrant/packages/helm-v3.19.1-linux-amd64.tar.gz
+tar -C /usr/local/bin --strip-components 1 -xzvf /vagrant/packages/helm-v3.19.1-linux-amd64.tar.gz linux-amd64/helm
+
+# echo "Helm 安装完成，版本信息："
+# helm version
+
+# 安装 Kubernetes Dashboard
+bash dashboard.sh
