@@ -1,0 +1,47 @@
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-http
+  namespace: dev
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: nginx.itheima.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nginx-service
+            port: 
+              number: 80
+
+  - host: tomcat.itheima.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service: 
+            name: tomcat-service
+            port: 
+              number: 8080
+
+# 查看服务入口
+# kubectl get service ingress-nginx-controller --namespace=ingress-nginx
+# root@k8s-master:/etc/kubernetes/pki# kubectl get service ingress-nginx-controller --namespace=ingress-nginx
+# NAME                       TYPE           CLUSTER-IP     EXTERNAL-IP   PORT(S)                      AGE
+# ingress-nginx-controller   LoadBalancer   10.96.50.185   <pending>     80:30145/TCP,443:31588/TCP   73m
+
+# 配置本地hosts文件，添加如下内容：
+# 192.168.33.10 nginx.itheima.com
+# 192.168.33.10 tomcat.itheima.com
+
+# 访问测试
+# http://nginx.itheima.com:30145/ 或 https://nginx.itheima.com:31588/
+# http://tomcat.itheima.com:30145/ 或 https://tomcat.itheima.com:31588/
+
+# 修改 Deployment 配置 在 Ingress Nginx 的 Deployment 中conteiners 之前添加 hostNetwork: true
+# 可以直接访问 http://nginx.itheima.com 和 http://tomcat.itheima.com
