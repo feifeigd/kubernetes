@@ -1,0 +1,23 @@
+
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: pc-daemonset
+  namespace: dev
+spec:
+  selector:
+    matchLabels:
+      app: nginx-daemonset
+  template:
+    metadata:
+      labels:
+        app: nginx-daemonset
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+          name: web
+
+          
