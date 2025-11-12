@@ -6,10 +6,10 @@ echo "安装 NFS 服务端"
 apt-get update
 apt-get install -y nfs-kernel-server
 # 创建 NFS 共享目录
-share_dir
+nfs_share_dir="/srv/nfs/share"
 chmod 777 $nfs_share_dir
 # 配置 NFS 导出
-echo "$nfs_share_dir *(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exportsnfs_share_dir="/srv/nfs/share"
+echo "$nfs_share_dir *(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exportsnfs_share_dir="$nfs_share_dir"
 mkdir -p $nfs_share_dir
 chown nobody:nogroup $nfs_
 # 基本语法：共享目录 客户端IP(选项)

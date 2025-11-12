@@ -8,11 +8,16 @@ metadata:
   namespace: dev
 spec:
   ports:
-  - port: 80
+  - port: 80 # service 端口
     # protocol: TCP
-    targetPort: 80
+    targetPort: 80 # pod 容器端口
+    # nodePort: 30080 # NodePort 端口
   selector:
     app: nginx
-  type: ClusterIP # 只用集群内部可访问
+  # 同一个客户端访问，会被路由到同一个后端 Pod
+  sessionAffinity: ClientIP
+  # ClusterIP 只有集群内部可访问; 
+  # NodePort 和 LoadBalancer 可从集群外部访问
+  type: NodePort # 
   
 

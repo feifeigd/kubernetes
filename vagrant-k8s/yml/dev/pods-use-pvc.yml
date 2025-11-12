@@ -16,6 +16,25 @@ spec:
   - name: pvc-volume
     persistentVolumeClaim:
       claimName: pvc-1
-      # readOnly: false
+      readOnly: false
 
 ---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-2
+  namespace: dev
+spec:
+  containers:
+  - name: busybox
+    image: busybox
+    command: ["sh", "-c", "while true;do echo `date +%s` pod1  >> /root/out.txt; sleep 10; done"]
+    volumeMounts:
+    - name: pvc-volume
+      mountPath: /root/
+  volumes:
+  - name: pvc-volume
+    persistentVolumeClaim:
+      claimName: pvc-2
+      readOnly: false
