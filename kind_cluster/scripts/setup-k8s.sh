@@ -25,6 +25,8 @@ main() {
     # delete_cluster
     kubectl config use-context kind-${CLUSTER_NAME}
 
+    deploy
+
     kubectl get nodes
     log "节点查看完成"
 
@@ -76,6 +78,10 @@ view_cluster() {
 delete_cluster() {
     kind delete cluster --name $CLUSTER_NAME
     log "集群删除完成"
+}
+
+deploy(){
+    kubectl apply -f k8s/nginx-pod.yaml
 }
 
 main "$@"
